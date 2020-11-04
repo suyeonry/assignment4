@@ -4,8 +4,9 @@ author: "Suyeon Ryu"
 date: '2020 11 1 '
 output: html_document
 ---
-HPC
-Problem 1: Make sure your code is nice
+#HPC
+
+## Problem 1: Make sure your code is nice
 Rewrite the following R functions to make them faster. It is OK (and recommended) to take a look at Stackoverflow and Google
 
 
@@ -96,7 +97,7 @@ microbenchmark::microbenchmark(
 
 
 
-Answer : With new function, it was about 4.8 times faster for the first part. 
+With new function, it was about 4.8 times faster for the first part. 
 
 
 
@@ -106,8 +107,11 @@ Answer : With new function, it was about 4.8 times faster for the first part.
 
 
 
-Problem 2: Make things run faster with parallel computing
-The following function allows simulating PI
+## Problem 2: Make things run faster with parallel computing
+
+```{r, include=FALSE}
+
+#The following function allows simulating PI
 
 sim_pi <- function(n = 1000, i = NULL) {
   p <- matrix(runif(n*2), ncol = 2)
@@ -117,7 +121,8 @@ sim_pi <- function(n = 1000, i = NULL) {
 # Here is an example of the run
 set.seed(156)
 sim_pi(1000) # 3.132
-In order to get accurate estimates, we can run this function multiple times, with the following code:
+
+# In order to get accurate estimates, we can run this function multiple times, with the following code:
 
 # This runs the simulation a 4,000 times, each with 10,000 points
 set.seed(1231)
@@ -125,15 +130,32 @@ system.time({
   ans <- unlist(lapply(1:4000, sim_pi, n = 10000))
   print(mean(ans))
 })
-Rewrite the previous code using parLapply() to make it run faster. Make sure you set the seed using clusterSetRNGStream():
+```
 
-# YOUR CODE HERE
-system.time({
-  # YOUR CODE HERE
-  ans <- # YOUR CODE HERE
-  print(mean(ans))
-  # YOUR CODE HERE
-})
+
+
+```{r}
+# Rewrite the previous code using parLapply() to make it run faster. Make sure you set the seed using clusterSetRNGStream():
+
+## make cluster 
+
+  clust <- makeCluster(4L)
+  clusterSetRNGStream(clust, iseed=1231)
+
+  system.time({
+  ans2 <- unlist(parLapply(clust, 1:4000, sim_pi, n=10000))
+  print(mean(ans2))
+  })
+
+  stopCluster(clust)
+
+```
+
+Using parallel computing, the user time was decreased from 3.66 to 0.01, and elapsed time decreased from 3.72 to 1.92.
+
+
+
+
 SQL
 Setup a temporary database by running the following chunk
 

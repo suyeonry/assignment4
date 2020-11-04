@@ -417,7 +417,10 @@ summary {
 </div>
 
 
-<p>HPC Problem 1: Make sure your code is nice Rewrite the following R functions to make them faster. It is OK (and recommended) to take a look at Stackoverflow and Google</p>
+<p>#HPC</p>
+<div id="problem-1-make-sure-your-code-is-nice" class="section level2">
+<h2>Problem 1: Make sure your code is nice</h2>
+<p>Rewrite the following R functions to make them faster. It is OK (and recommended) to take a look at Stackoverflow and Google</p>
 <pre class="r"><code># Total row sums
 fun1 &lt;- function(mat){
   n &lt;- nrow(mat)
@@ -477,32 +480,39 @@ microbenchmark::microbenchmark(
   fun1alt(dat), unit = &quot;relative&quot;, check = &quot;equivalent&quot;
 )</code></pre>
 <pre><code>## Unit: relative
-##          expr      min       lq     mean   median       uq      max neval
-##     fun1(dat) 4.778455 4.853465 4.257686 4.671502 5.319361 1.159847   100
-##  fun1alt(dat) 1.000000 1.000000 1.000000 1.000000 1.000000 1.000000   100</code></pre>
+##          expr     min       lq     mean   median       uq       max neval
+##     fun1(dat) 4.74187 4.877976 4.024395 5.213163 5.234104 0.4093445   100
+##  fun1alt(dat) 1.00000 1.000000 1.000000 1.000000 1.000000 1.0000000   100</code></pre>
 <pre class="r"><code># Test for the second
 microbenchmark::microbenchmark(
   fun2(dat),
   fun2alt(dat), unit = &quot;relative&quot;, check = &quot;equivalent&quot;
 )</code></pre>
 <pre><code>## Unit: relative
-##          expr     min       lq     mean  median       uq      max neval
-##     fun2(dat) 1.00000 1.000000 1.000000 1.00000 1.000000 1.000000   100
-##  fun2alt(dat) 1.64295 1.651066 1.631853 1.60901 1.513467 2.892471   100</code></pre>
-<p>Answer : With new function, it was about 4.8 times faster for the first part.</p>
-<p>Problem 2: Make things run faster with parallel computing The following function allows simulating PI</p>
-<p>sim_pi &lt;- function(n = 1000, i = NULL) { p &lt;- matrix(runif(n<em>2), ncol = 2) mean(rowSums(p^2) &lt; 1) </em> 4 }</p>
-<div id="here-is-an-example-of-the-run" class="section level1">
-<h1>Here is an example of the run</h1>
-<p>set.seed(156) sim_pi(1000) # 3.132 In order to get accurate estimates, we can run this function multiple times, with the following code:</p>
+##          expr      min       lq     mean   median       uq      max neval
+##     fun2(dat) 1.000000 1.000000 1.000000 1.000000 1.000000 1.000000   100
+##  fun2alt(dat) 1.642677 1.657763 1.596411 1.478458 1.397118 2.660438   100</code></pre>
+<p>With new function, it was about 4.8 times faster for the first part.</p>
 </div>
-<div id="this-runs-the-simulation-a-4000-times-each-with-10000-points" class="section level1">
-<h1>This runs the simulation a 4,000 times, each with 10,000 points</h1>
-<p>set.seed(1231) system.time({ ans &lt;- unlist(lapply(1:4000, sim_pi, n = 10000)) print(mean(ans)) }) Rewrite the previous code using parLapply() to make it run faster. Make sure you set the seed using clusterSetRNGStream():</p>
-</div>
-<div id="your-code-here" class="section level1">
-<h1>YOUR CODE HERE</h1>
-<p>system.time({ # YOUR CODE HERE ans &lt;- # YOUR CODE HERE print(mean(ans)) # YOUR CODE HERE }) SQL Setup a temporary database by running the following chunk</p>
+<div id="problem-2-make-things-run-faster-with-parallel-computing" class="section level2">
+<h2>Problem 2: Make things run faster with parallel computing</h2>
+<pre class="r"><code># Rewrite the previous code using parLapply() to make it run faster. Make sure you set the seed using clusterSetRNGStream():
+
+## make cluster 
+
+  clust &lt;- makeCluster(4L)
+  clusterSetRNGStream(clust, iseed=1231)
+
+  system.time({
+  ans2 &lt;- unlist(parLapply(clust, 1:4000, sim_pi, n=10000))
+  print(mean(ans2))
+  })</code></pre>
+<pre><code>## [1] 3.141578</code></pre>
+<pre><code>##    user  system elapsed 
+##    0.00    0.00    1.92</code></pre>
+<pre class="r"><code>  stopCluster(clust)</code></pre>
+<p>Using parallel computing, the user time was decreased from 3.66 to 0.01, and elapsed time decreased from 3.72 to 1.92.</p>
+<p>SQL Setup a temporary database by running the following chunk</p>
 </div>
 <div id="install.packagescrsqlite-dbi" class="section level1">
 <h1>install.packages(c(“RSQLite”, “DBI”))</h1>
